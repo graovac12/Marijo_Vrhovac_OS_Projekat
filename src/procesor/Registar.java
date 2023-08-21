@@ -43,5 +43,5 @@ public class Registar {
 	public String getNaziv() {
 		return naziv;
 	}
-	
+	//
 }
