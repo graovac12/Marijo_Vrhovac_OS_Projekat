@@ -3,6 +3,16 @@ package procesor;
 public class Registar {
 	private String naziv;
 	private String adresa;
+	private String strVrijednost;
+	public String getStrVrijednost() {
+		return strVrijednost;
+	}
+	public void setStrVrijednost(String strVrijednost) {
+		this.strVrijednost = strVrijednost;
+	}
+	public void setNaziv(String naziv) {
+		this.naziv = naziv;
+	}
 	private int vrijednost;
 	
 	public Registar(String naziv,String adresa, int vrijednost)
