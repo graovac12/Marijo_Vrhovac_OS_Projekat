@@ -40,14 +40,14 @@ public class Procesor {
 		neaktivan=false;
 		trenutniProces.setStartVrijeme(startMS);
 		int refVrijeme=1;
-		while(proces.isIzrsava()&&System.currentTimeMillis()-startMS<refVrijeme)
+		while(proces.isIzrsava())
 		{
 			ir.setStrVrijednost(proces.getInstrukcije().get(pc.getVrijednost()));
 			izvrsiMasinskiKod();
 			reginfo();
 		}
 		try {
-			Thread.sleep(2000);
+			Thread.sleep(200);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

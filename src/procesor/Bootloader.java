@@ -18,8 +18,8 @@ public class Bootloader {
 	public static void ukljucivanje()
 	{
 		upravljacMemorije=new UpravljacMemorije(4096);
-		root=new SistemFajlova(new File("C:\\Users\\graovac\\Desktop\\os-project_os-simulator-master\\src\\main\\resources\\programs"));
 		disk=new SekundarnaMemorija();
+		root=new SistemFajlova(new File("C:\\Users\\graovac\\eclipse-workspace\\Marijo_Vrhovac_OS_Projekat\\src\\programi"));
 		asembler=new Asembler();
 		procesor=new Procesor(asembler);
 		rasporedjivac=new RasporedjivacProcesa();
@@ -56,19 +56,23 @@ public class Bootloader {
 	public static void setDisk(SekundarnaMemorija disk) {
 		Bootloader.disk = disk;
 	}
+	public static void refreshTree()
+	{
+		root=new SistemFajlova(new File("C:\\Users\\graovac\\eclipse-workspace\\Marijo_Vrhovac_OS_Projekat\\src\\programi"));
+	}
 	public static void main(String args[])
 	{
-		ukljucivanje();
-		System.out.println(SekundarnaMemorija.slobodniBlokovi.size());
+		//ukljucivanje();
+		//System.out.println(SekundarnaMemorija.slobodniBlokovi.size());
 		//SistemFajlova.obrisiFajl("test03.asm");
 		//root=new SistemFajlova(new File("C:\\Users\\graovac\\Desktop\\os-project_os-simulator-master\\src\\main\\resources\\programs"));
-		SistemFajlova.prikaziDirektorij();
+		//SistemFajlova.prikaziDirektorij();
 		//SistemFajlova.obrisiDirektorij("l");
 		//SistemFajlova.obrisiFajl(".txt");
-		Proces p=new Proces("a","test01.asm",null,0);
-		Proces p2=new Proces("a","test01.asm",null,0);
-		Memorija.ispisStanja();
-		System.out.println(p.getRezultatProcesa());
+		//Proces p=new Proces("a","test01.asm",null,0);
+		//Proces p2=new Proces("a","test01.asm",null,0);
+		//Memorija.ispisStanja();
+		//System.out.println(p.getRezultatProcesa());
 
 		
 		

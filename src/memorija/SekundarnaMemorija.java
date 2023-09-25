@@ -6,7 +6,7 @@ import java.util.LinkedList;
 
 public class SekundarnaMemorija {
 	private static int velicina;
-    public static LinkedList<Blok> slobodniBlokovi=new LinkedList<>();
+    public static ArrayList<Blok> slobodniBlokovi=new ArrayList<>();
     private static Blok[] sviBlokovi;
     private static int brojBlokova;
     public static ArrayList<Fajl> fajlovi=new ArrayList<>();
@@ -19,8 +19,9 @@ public class SekundarnaMemorija {
     	{
     		Blok noviBlok=new Blok(i);
     		sviBlokovi[i]=noviBlok;
-    		slobodniBlokovi.add(noviBlok);
+    		slobodniBlokovi.add(sviBlokovi[i]);
     	}
+    	System.out.println(slobodniBlokovi.size());
     	fajlovi=new ArrayList<Fajl>();
     }
 	public static int getVelicina() {
@@ -29,14 +30,16 @@ public class SekundarnaMemorija {
 	public void sacuvajFajl(Fajl fajl)
 	{
 		int ostatak=fajl.getVelicina()%Blok.getBlokVelicina();
+		System.out.println(fajl.getVelicina());
 		int potrebnoBlokova;
 		if(ostatak==0)
 		{
-			potrebnoBlokova=fajl.getVelicina()/Blok.getBlokVelicina();
+			potrebnoBlokova=fajl.getVelicina()/4;
 		}
 		else {
-			potrebnoBlokova=(fajl.getVelicina()+4-ostatak)/Blok.getBlokVelicina();
+			potrebnoBlokova=(fajl.getVelicina()+4-ostatak)/4;
 		}
+		System.out.println(potrebnoBlokova);
 		if(potrebnoBlokova>brojSlobodnih())
 		{
 			System.out.println("Spremanje neuspjesno, nedovoljno memorije");
@@ -44,37 +47,46 @@ public class SekundarnaMemorija {
 		}
 		int brojac=0;
 		Blok pomocni=null;
+		int indeks=slobodniBlokovi.get(0).getAdresa();
+		slobodniBlokovi.remove(0);
+		fajlovi.add(fajl);
 		while(true)
 		{
-			fajlovi.add(fajl);
 			if(brojac==0)
 			{
 				if(slobodniBlokovi.isEmpty())
 					return;
-				pomocni=slobodniBlokovi.getFirst();
-				fajl.setIndeksBlok(pomocni.getAdresa());
-				pomocni.setSadrzaj(Fajl.parsiraj(pomocni.getAdresa()));
-				brojac++;
-				slobodniBlokovi.removeFirst();
-				pomocni.setSljedeci(slobodniBlokovi.getFirst());
-				pomocni=pomocni.getSljedeci();
-			}
-			else
-			{
-				sviBlokovi[pomocni.getAdresa()].setSadrzaj(Fajl.parsiraj(pomocni.getAdresa()));
-				brojac++;
-				slobodniBlokovi.removeFirst();
-				if(slobodniBlokovi.isEmpty())
-					return;
-				pomocni.setSljedeci(slobodniBlokovi.getFirst());
-				pomocni=pomocni.getSljedeci();
+				//slobodniBlokovi.remove(0);
+				sviBlokovi[indeks].setZauzet(true);
+				fajl.setIndeksBlok(sviBlokovi[indeks].getAdresa());
+				sviBlokovi[indeks].setSadrzaj(Fajl.parsiraj(brojac));
+				sviBlokovi[indeks].setSljedeci(slobodniBlokovi.get(0).getAdresa());
 				if(brojac==potrebnoBlokova)
 				{
 					fajl.setDuzina(brojac);
-					
-					pomocni.setSljedeci(new Blok(-1));
+					sviBlokovi[indeks].setSljedeci(-1);
 					return;
 				}
+				indeks=sviBlokovi[sviBlokovi[indeks].getSljedeci()].getAdresa();
+				brojac++;
+			}
+			else
+			{
+				
+				sviBlokovi[sviBlokovi[indeks].getAdresa()].setSadrzaj(Fajl.parsiraj(brojac));
+				slobodniBlokovi.remove(0);
+				if(slobodniBlokovi.isEmpty())
+					return;
+				sviBlokovi[indeks].setZauzet(true);
+				sviBlokovi[indeks].setSljedeci(slobodniBlokovi.get(0).getAdresa());
+				if(brojac==potrebnoBlokova)
+				{
+					fajl.setDuzina(brojac);
+					sviBlokovi[indeks].setSljedeci(-1);
+					return;
+				}
+				indeks=sviBlokovi[sviBlokovi[indeks].getSljedeci()].getAdresa();
+				brojac++;
 			}
 		}
 	}
@@ -89,41 +101,53 @@ public class SekundarnaMemorija {
 		Blok pomocni=sviBlokovi[indeks];
 		if(pomocni==null)
 			return;
-		while(pomocni!=null)
+		while(pomocni.getSljedeci()!=-1)
 		{
-			slobodniBlokovi.add(pomocni);
 			pomocni.setZauzet(false);
 			pomocni.setSadrzaj(null);
-			pomocni=pomocni.getSljedeci();
+			slobodniBlokovi.add(sviBlokovi[pomocni.getAdresa()]);
+			pomocni=sviBlokovi[pomocni.getSljedeci()];
 			
 		}
+		pomocni.setZauzet(false);
+		pomocni.setSadrzaj(null);
+		slobodniBlokovi.add(sviBlokovi[pomocni.getAdresa()]);
 		fajlovi.remove(fajl);
 	}
 	public String procitajFajl(Fajl fajl)
 	{
 		String rez="";
+		System.out.println(fajlovi.size());
 		int indeks=fajl.getIndeksBlok();
 		Blok pomocni=sviBlokovi[indeks];
 		if(pomocni==null)
 			return rez;
-		while(pomocni!=null)
+		while(pomocni.getSljedeci()!=-1)
 		{
-			byte[] sadrzaj=pomocni.getSadrzaj();
+			byte[] sadrzaj=sviBlokovi[pomocni.getAdresa()].getSadrzaj();
 			for(byte bajt:sadrzaj)
 			{
 				rez+=(char)bajt;
 			}
-			pomocni=pomocni.getSljedeci();
+			pomocni=sviBlokovi[pomocni.getSljedeci()];
 		}
-		System.out.println(rez);
+		byte[] sadrzaj=sviBlokovi[pomocni.getAdresa()].getSadrzaj();
+		for(byte bajt:sadrzaj)
+		{
+			rez+=(char)bajt;
+		}
+		System.out.println(rez+" ");
+		String[] rezSplit=rez.split("\n");
+		System.out.println(rezSplit.length);
 		return rez;
 	}
 	public Fajl getFajl(String fName)
 	{
 		for(Fajl f:fajlovi)
 		{
-			if(f.getNaziv().trim().compareTo(fName.trim())==0)
+			if(f.naziv.equals(fName))
 			{
+				System.out.println(f.naziv);
 				return f;
 			}
 		}
@@ -132,10 +156,10 @@ public class SekundarnaMemorija {
 	public static void setVelicina(int velicina) {
 		SekundarnaMemorija.velicina = velicina;
 	}
-	public static LinkedList<Blok> getSlobodniBlokovi() {
+	public static ArrayList<Blok> getSlobodniBlokovi() {
 		return slobodniBlokovi;
 	}
-	public static void setSlobodniBlokovi(LinkedList<Blok> slobodniBlokovi) {
+	public static void setSlobodniBlokovi(ArrayList<Blok> slobodniBlokovi) {
 		SekundarnaMemorija.slobodniBlokovi = slobodniBlokovi;
 	}
 	public static Blok[] getSviBlokovi() {
@@ -166,7 +190,7 @@ public class SekundarnaMemorija {
 			}
 		return false;
 	}
-	public int brojSlobodnih()
+	public static int brojSlobodnih()
 	{
 		int br=0;
 		for(Blok b:sviBlokovi)

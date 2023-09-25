@@ -1,5 +1,8 @@
 package procesor;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -8,8 +11,15 @@ import java.util.List;
 
 import memorija.Memorija;
 import memorija.Particija;
+import memorija.UpravljacMemorije;
 
 public class Proces {
+	@Override
+	public String toString() {
+		return "pID=" + pID + ", stanje=" + stanje + ", ulazniFajl=" + ulazniFajl + ", velicina=" + velicina
+				+ ", responseRatio=" + responseRatio + ", startVrijeme=" + startVrijeme + ", sveukupnoVrijeme="
+				+ sveukupnoVrijeme + ", rezultatProcesa=" + rezultatProcesa + ", izlazniFajl=" + izlazniFajl ;
+	}
 	private int pID;
 	private ProcesStanje stanje;
 	private String naziv,ulazniFajl;
@@ -40,17 +50,16 @@ public class Proces {
 		this.putanjaDoFajla=Paths.get(Bootloader.getRoot().getTrenutni().getAbsolutePath()+"/"+ulazniFajl);
 		this.prioritet=prioritet;
 		this.stanje=ProcesStanje.SPREMAN;
-		this.velicinaInstrukcija=instrukcije.size();
 		this.pID=RasporedjivacProcesa.procesi.size();
 		this.vrijednostRegistara=new int[4];
 		ucitajFajl();
+		this.velicinaInstrukcija=instrukcije.size();
 		for(int i=0;i<velicinaInstrukcija;i++)
 			this.velicina+=instrukcije.get(i).length();
-		for(String inst:instrukcije)
-		{
-			System.out.println(inst);
-		}
+		
 		this.velicina=Math.round(this.velicina/8)+16;
+		System.out.println(putanjaDoFajla.toString());
+		System.out.println("belicina:"+velicina);
 		this.responseRatio=(sveukupnoVrijeme+velicina)/velicina;
 		RasporedjivacProcesa.red.add(this);
 		RasporedjivacProcesa.procesi.add(this);
@@ -78,13 +87,13 @@ public class Proces {
 	}
 	public void prekiniProces()
 	{
-		if(this.isIzrsava())
+		if(this.isIzrsava()||this.isSpreman()||this.isBlokiran())
 		{
-			System.out.println(this.pID+" je vec spreman");
-			return;
+			this.stanje=ProcesStanje.PREKINUT;
+			this.izlazniFajl=null;
+			UpravljacMemorije.ukloniProces(this);
+			System.out.println(this.pID+" je prekinut");
 		}
-		this.stanje=ProcesStanje.SPREMAN;
-		RasporedjivacProcesa.red.add(this);
 	}
 	public float getResponseRatio() {
 		return responseRatio;
@@ -94,14 +103,20 @@ public class Proces {
 	}
 	private void ucitajFajl()
 	{
-		List<String> fSadrzaj=List.of(Bootloader.getDisk().procitajFajl(Bootloader.getDisk().getFajl(this.ulazniFajl)).split("\n"));
+		List<String> fSadrzaj=null;
+		System.out.println(putanjaDoFajla);
+		try {
+			fSadrzaj = Files.readAllLines(putanjaDoFajla);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		ArrayList<String> sadrzaj=new ArrayList<>();
 		for(String s:fSadrzaj)
 		{
 			sadrzaj.add(s);
 			System.out.println(s);
 		}
-		sadrzaj.remove(sadrzaj.size()-1);
 		System.out.println("Vel: "+fSadrzaj.size());
 		for(String inst:sadrzaj)
 		{

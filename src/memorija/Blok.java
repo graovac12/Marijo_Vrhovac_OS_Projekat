@@ -1,16 +1,18 @@
 package memorija;
 
+import java.util.Arrays;
+
 public class Blok {
 	private final static int BLOK_VELICINA = 4;
     private byte[] sadrzaj = new byte[BLOK_VELICINA];
     private final int adresa;
     private boolean zauzet;
-    private Blok sljedeci;
+    private int sljedeci;
     
     public Blok(int adresa) {
         this.adresa = adresa;
-        setZauzet(false);
-        sljedeci=null;
+       zauzet=false;
+        sljedeci=-1;
     }
    
     public byte[] getSadrzaj() {
@@ -31,6 +33,12 @@ public class Blok {
 
 	
 
+	@Override
+	public String toString() {
+		return "Blok [sadrzaj=" + Arrays.toString(sadrzaj) + ", adresa=" + adresa + ", zauzet=" + zauzet + ", sljedeci="
+				+ sljedeci + "]";
+	}
+
 	public static int getVelicina() {
 		return BLOK_VELICINA;
 	}
@@ -41,11 +49,11 @@ public class Blok {
 
 	
 
-	public Blok getSljedeci() {
+	public int getSljedeci() {
 		return sljedeci;
 	}
 
-	public void setSljedeci(Blok sljedeci) {
+	public void setSljedeci(int sljedeci) {
 		this.sljedeci = sljedeci;
 	}
 

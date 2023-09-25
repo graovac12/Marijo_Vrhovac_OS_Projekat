@@ -60,4 +60,13 @@ public class RasporedjivacProcesa extends Thread{
 			
 		}
 	}
-}}
+		
+}
+	public static void htop()
+	{System.out.println("htop:");
+		for(Proces p:procesi)
+		{
+			System.out.println(p);
+		}
+	}
+}

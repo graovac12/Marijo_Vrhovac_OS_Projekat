@@ -1,5 +1,7 @@
 package memorija;
 
+import procesor.Bootloader;
+
 public class Fajl {
 	String naziv;
 	private int velicina;
@@ -61,7 +63,8 @@ public class Fajl {
 	public Fajl(String naziv,byte sadrzaj[])
 	{
 		this.naziv=naziv;
+		duzina=sadrzaj.length;
 		sadrzajFajla=sadrzaj;
-		duzina=sadrzajFajla.length;
+		velicina=sadrzaj.length;
 	}
 }

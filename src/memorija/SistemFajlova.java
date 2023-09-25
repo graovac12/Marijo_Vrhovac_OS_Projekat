@@ -21,6 +21,8 @@ public class SistemFajlova {
 		System.out.println("Sistem fajlova kreiran:");
 		korijen=putanja;
 		trenutni=korijen;
+		cvor=new TreeItem<>(korijen);
+		kreirajDrvo(cvor);
 		
 	}
 	public void kreirajDrvo(TreeItem<File> korijen)
@@ -40,6 +42,7 @@ public class SistemFajlova {
 				{
 					byte[] sadrzaj=Files.readAllBytes(item.getValue().toPath());
 					Fajl noviFajl=new Fajl(item.getValue().getName(),sadrzaj);
+					System.out.println(noviFajl.getVelicina());
 					if(!Bootloader.getDisk().sadrziFajl(item.getValue().getName()))
 					{
 						Bootloader.getDisk().sacuvajFajl(noviFajl);
