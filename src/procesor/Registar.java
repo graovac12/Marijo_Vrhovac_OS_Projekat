@@ -24,7 +24,12 @@ public class Registar {
 	public Registar(String naziv,int vrijednost)
 	{
 		this.naziv=naziv;
-		this.adresa=adresa;
+		this.vrijednost=vrijednost;
+	}
+	public Registar(String naziv,String vrijednost)
+	{
+		this.naziv=naziv;
+		this.strVrijednost=vrijednost;
 	}
 	public void povecajVrijedost(int deltaVrijednost)
 	{

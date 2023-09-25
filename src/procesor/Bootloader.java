@@ -1,5 +1,8 @@
 package procesor;
 
+import java.io.File;
+
+import memorija.Memorija;
 import memorija.SekundarnaMemorija;
 import memorija.SistemFajlova;
 import memorija.UpravljacMemorije;
@@ -10,11 +13,17 @@ public class Bootloader {
 	private static Asembler asembler;
 	private static SekundarnaMemorija disk;
 	private static SistemFajlova root;
+	private static RasporedjivacProcesa rasporedjivac;
 	
 	public static void ukljucivanje()
 	{
-		//root=new SistemFajlova();
+		upravljacMemorije=new UpravljacMemorije(4096);
+		root=new SistemFajlova(new File("C:\\Users\\graovac\\Desktop\\os-project_os-simulator-master\\src\\main\\resources\\programs"));
 		disk=new SekundarnaMemorija();
+		asembler=new Asembler();
+		procesor=new Procesor(asembler);
+		rasporedjivac=new RasporedjivacProcesa();
+		rasporedjivac.start();
 	}
 	//private static 
 	public static Procesor getProcesor() {
@@ -47,5 +56,22 @@ public class Bootloader {
 	public static void setDisk(SekundarnaMemorija disk) {
 		Bootloader.disk = disk;
 	}
-	
+	public static void main(String args[])
+	{
+		ukljucivanje();
+		System.out.println(SekundarnaMemorija.slobodniBlokovi.size());
+		//SistemFajlova.obrisiFajl("test03.asm");
+		//root=new SistemFajlova(new File("C:\\Users\\graovac\\Desktop\\os-project_os-simulator-master\\src\\main\\resources\\programs"));
+		SistemFajlova.prikaziDirektorij();
+		//SistemFajlova.obrisiDirektorij("l");
+		//SistemFajlova.obrisiFajl(".txt");
+		Proces p=new Proces("a","test01.asm",null,0);
+		Proces p2=new Proces("a","test01.asm",null,0);
+		Memorija.ispisStanja();
+		System.out.println(p.getRezultatProcesa());
+
+		
+		
+		
+	}
 }

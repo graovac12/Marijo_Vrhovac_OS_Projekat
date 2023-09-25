@@ -1,6 +1,7 @@
 package memorija;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -9,13 +10,15 @@ import java.nio.file.Paths;
 
 import javafx.scene.control.TreeItem;
 import procesor.Bootloader;
+import procesor.Proces;
 
 public class SistemFajlova {
 	private static File korijen;
 	private static File trenutni;
-	private static TreeItem<File> cvor;
+	private TreeItem<File> cvor;
 	public SistemFajlova(File putanja)
 	{
+		System.out.println("Sistem fajlova kreiran:");
 		korijen=putanja;
 		trenutni=korijen;
 		
@@ -54,6 +57,20 @@ public class SistemFajlova {
 		cvor=new TreeItem<>(trenutni);
 		kreirajDrvo(cvor);
 		return cvor;
+	}
+	public static void napraviFajl(Proces proces)
+	{
+		if(proces.getIzlazniFajl()==null)
+			return;
+		File novi =new File(proces.getPutanjaDoFajla().getParent()+"/"+proces.getIzlazniFajl()+".txt");
+		try {
+			FileWriter fw=new FileWriter(novi);
+			fw.write("Rezultat: "+ proces.getRezultatProcesa()+" Naziv procesa: "+proces.getNaziv());
+			fw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	public static void promijeniDirektorij(String dir)
 	{
@@ -106,5 +123,44 @@ public class SistemFajlova {
             	Bootloader.getDisk().obrisiFajl(Bootloader.getDisk().getFajl(fIme));
             }
         }
+	}
+	public static void prikaziDirektorij()
+	{
+		System.out.println("Direktorij: "+trenutni.getName());
+		for(TreeItem<File> fajl:Bootloader.getRoot().getDrvoItem().getChildren())
+		{
+			byte[] sadrzajDatoteke=null;
+			try {
+				if(!fajl.getValue().isDirectory())
+				{
+					sadrzajDatoteke=Files.readAllBytes(fajl.getValue().toPath());
+				}
+				if(fajl.getValue().isDirectory())
+					System.out.println("dir "+ fajl.getValue().getName());
+				else
+					System.out.println("dat "+ fajl.getValue().getName()+" "+fajl.getValue().getName()+" "+sadrzajDatoteke.length);
+			}catch(IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+	public  File getKorijen() {
+		return korijen;
+	}
+	public void setKorijen(File korijen) {
+		SistemFajlova.korijen = korijen;
+	}
+	public File getTrenutni() {
+		return trenutni;
+	}
+	public void setTrenutni(File trenutni) {
+		SistemFajlova.trenutni = trenutni;
+	}
+	public TreeItem<File> getCvor() {
+		return cvor;
+	}
+	public void setCvor(TreeItem<File> cvor) {
+		this.cvor = cvor;
 	}
 }

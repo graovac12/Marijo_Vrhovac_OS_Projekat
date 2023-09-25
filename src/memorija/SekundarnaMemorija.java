@@ -6,10 +6,10 @@ import java.util.LinkedList;
 
 public class SekundarnaMemorija {
 	private static int velicina;
-    private static LinkedList<Blok> slobodniBlokovi;
+    public static LinkedList<Blok> slobodniBlokovi=new LinkedList<>();
     private static Blok[] sviBlokovi;
     private static int brojBlokova;
-    public static ArrayList<Fajl> fajlovi;
+    public static ArrayList<Fajl> fajlovi=new ArrayList<>();
     public SekundarnaMemorija()
     {
     	velicina=4096;
@@ -46,11 +46,14 @@ public class SekundarnaMemorija {
 		Blok pomocni=null;
 		while(true)
 		{
+			fajlovi.add(fajl);
 			if(brojac==0)
 			{
+				if(slobodniBlokovi.isEmpty())
+					return;
 				pomocni=slobodniBlokovi.getFirst();
 				fajl.setIndeksBlok(pomocni.getAdresa());
-				pomocni.setSadrzaj("sb ".getBytes());
+				pomocni.setSadrzaj(Fajl.parsiraj(pomocni.getAdresa()));
 				brojac++;
 				slobodniBlokovi.removeFirst();
 				pomocni.setSljedeci(slobodniBlokovi.getFirst());
@@ -61,12 +64,14 @@ public class SekundarnaMemorija {
 				sviBlokovi[pomocni.getAdresa()].setSadrzaj(Fajl.parsiraj(pomocni.getAdresa()));
 				brojac++;
 				slobodniBlokovi.removeFirst();
+				if(slobodniBlokovi.isEmpty())
+					return;
 				pomocni.setSljedeci(slobodniBlokovi.getFirst());
 				pomocni=pomocni.getSljedeci();
 				if(brojac==potrebnoBlokova)
 				{
 					fajl.setDuzina(brojac);
-					fajlovi.add(fajl);
+					
 					pomocni.setSljedeci(new Blok(-1));
 					return;
 				}
@@ -82,7 +87,9 @@ public class SekundarnaMemorija {
 		}
 		int indeks=fajl.getIndeksBlok();
 		Blok pomocni=sviBlokovi[indeks];
-		while(pomocni.getAdresa()!=-1)
+		if(pomocni==null)
+			return;
+		while(pomocni!=null)
 		{
 			slobodniBlokovi.add(pomocni);
 			pomocni.setZauzet(false);
@@ -97,7 +104,9 @@ public class SekundarnaMemorija {
 		String rez="";
 		int indeks=fajl.getIndeksBlok();
 		Blok pomocni=sviBlokovi[indeks];
-		while(pomocni.getAdresa()!=-1)
+		if(pomocni==null)
+			return rez;
+		while(pomocni!=null)
 		{
 			byte[] sadrzaj=pomocni.getSadrzaj();
 			for(byte bajt:sadrzaj)
@@ -106,6 +115,7 @@ public class SekundarnaMemorija {
 			}
 			pomocni=pomocni.getSljedeci();
 		}
+		System.out.println(rez);
 		return rez;
 	}
 	public Fajl getFajl(String fName)
@@ -150,7 +160,10 @@ public class SekundarnaMemorija {
 	{
 		for(Fajl f:fajlovi)
 			if(f.naziv.equals(fajl))
+			{
+				System.out.println(f.naziv);
 				return true;
+			}
 		return false;
 	}
 	public int brojSlobodnih()
